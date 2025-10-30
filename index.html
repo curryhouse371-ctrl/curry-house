@@ -1,21 +1,40 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f97316" />
   <title>Curry House — Menu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root { --ch-primary:#f97316; --ch-bg:#fff7ed; }
-    body { background: var(--ch-bg) url('images/texture-light.png') repeat; }
+    :root { --ch-primary:#f97316; --ch-ink:#1f2937; --ch-bg:#fff7ed; }
+    /* Fond orange clair texturé */
+    body{
+      background: var(--ch-bg);
+      background-image:
+        radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
+        radial-gradient(rgba(0,0,0,.02) 1px, transparent 1px);
+      background-size: 18px 18px, 28px 28px;
+      background-position: 0 0, 9px 9px;
+    }
     .title-gradient { color: var(--ch-primary); }
     .card { background:#fff; border-radius:1rem; box-shadow:0 10px 20px rgba(0,0,0,.05); }
     .price { color:var(--ch-primary); font-weight:700; }
     .tag { background:rgba(249,115,22,.08); color:var(--ch-primary); }
+    .sticky-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+      background: #fff; border-top: 1px solid rgba(249,115,22,.25);
+      box-shadow: 0 -6px 16px rgba(0,0,0,.08);
+    }
+    .cat-image img{ width:100%; height: 15rem; }
+    @media (min-width: 768px){ .cat-image img{ height: 18rem; } }
+    .checkbox{ width: 1.15rem; height: 1.15rem; accent-color: var(--ch-primary); }
+    .qty-btn { background: #f97316; color: white; border-radius: 6px; width: 1.8rem; height: 1.8rem; text-align: center; line-height: 1.8rem; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 
-<body class="text-[15px] text-gray-800">
+<body class="text-[15px] text-gray-800 pb-28">
   <!-- Header -->
   <header class="max-w-6xl mx-auto px-4 py-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -38,7 +57,7 @@
       </p>
     </div>
 
-    <!-- (Optionnel) Filtres -->
+    <!-- Filtres -->
     <div class="mt-6 flex flex-col md:flex-row gap-3">
       <input id="search" type="search" placeholder="Rechercher un plat (ex. tikka, agneau, naan)" class="w-full md:flex-1 px-4 py-3 rounded-xl border border-orange-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-orange-300" />
       <select id="subcategoryFilter" class="px-4 py-3 rounded-xl border border-orange-200 bg-white/80">
@@ -48,7 +67,7 @@
   </header>
 
   <!-- Contenu -->
-  <main id="menu" class="max-w-6xl mx-auto px-4 pb-20"></main>
+  <main id="menu" class="max-w-6xl mx-auto px-4 pb-10"></main>
 
   <!-- Footer -->
   <footer class="border-t border-orange-100/60 bg-white/60 backdrop-blur-sm mt-10">
@@ -65,27 +84,32 @@
   <!-- IMAGES PAR CATÉGORIE -->
   <script>
     const CATEGORY_IMAGES = {
-      "Entrées": "images/entrees.jpg",
-      "Plats Tandoori": "images/tandoori.jpg",
-      "Recommandation du chef": "images/chef.jpg",
-      "Plats principaux": "images/plats-principaux.jpg",
-      "Dopiaza": "images/dopiaza.jpg",
-      "Dansak (lentilles, aigre-doux)": "images/dansak.jpg",
-      "Pathia (aigre-doux, pimenté)": "images/pathia.jpg",
-      "Épinards (saag)": "images/epinards.jpg",
-      "Jalfrezi (poivrons, piments verts)": "images/jalfrezi.jpg",
-      "Plats Korai": "images/korai.jpg",
-      "Plats Vindaloo (très pimenté)": "images/vindaloo.jpg",
-      "Plats Biryani (servi avec sauce curry)": "images/biryani.jpg",
-      "Plats Balti (tomates, coriandre, épices)": "images/balti.jpg",
-      "Pains maison": "images/naans.jpg",
-      "Riz basmati & accompagnements": "images/riz.jpg",
-      "Chicken madras (un peu pimenté) — base sauce madras": "images/madras.jpg",
-      "Boissons chaudes": "images/boissons.jpg"
+      "Entrées": "https://source.unsplash.com/1600x900/?indian,appetizer",
+      "Plats Tandoori": "https://source.unsplash.com/1600x900/?tandoori,grill,indian",
+      "Recommandation du chef": "https://source.unsplash.com/1600x900/?chef,indian,signature,platter",
+      "Tandoori masala": "https://source.unsplash.com/1600x900/?indian,curry,masala",
+      "Passanda (crémeux, doux)": "https://source.unsplash.com/1600x900/?indian,creamy,curry",
+      "Kurma (très doux, lait coco, amandes)": "https://source.unsplash.com/1600x900/?indian,kurma,coconut",
+      "Chicken curry (moyennement épicé)": "https://source.unsplash.com/1600x900/?indian,curry,chicken",
+      "Plats Rogan": "https://source.unsplash.com/1600x900/?indian,rogan,josh",
+      "Dopiaza": "https://source.unsplash.com/1600x900/?indian,curry,onion",
+      "Dansak (lentilles, aigre-doux)": "https://source.unsplash.com/1600x900/?dal,indian,lentil,curry",
+      "Pathia (aigre-doux, pimenté)": "https://source.unsplash.com/1600x900/?indian,curry,spicy",
+      "Épinards (saag)": "https://source.unsplash.com/1600x900/?saag,spinach,indian",
+      "Jalfrezi (poivrons, piments verts)": "https://source.unsplash.com/1600x900/?jalfrezi,indian,peppers",
+      "Plats Korai": "https://source.unsplash.com/1600x900/?korai,karahi,indian",
+      "Plats Vindaloo (très pimenté)": "https://source.unsplash.com/1600x900/?vindaloo,spicy,indian",
+      "Plats Biryani (servi avec sauce curry)": "https://source.unsplash.com/1600x900/?biryani,indian,rice",
+      "Plats Balti (tomates, coriandre, épices)": "https://source.unsplash.com/1600x900/?balti,indian,curry",
+      "Pains maison": "https://source.unsplash.com/1600x900/?naan,indian,bread,tandoor",
+      "Riz basmati": "https://source.unsplash.com/1600x900/?basmati,rice,indian",
+      "Accompagnements légumes": "https://source.unsplash.com/1600x900/?indian,vegetable,curry",
+      "Chicken madras (un peu pimenté) — base sauce madras": "https://source.unsplash.com/1600x900/?madras,curry,indian",
+      "Boissons chaudes": "https://source.unsplash.com/1600x900/?chai,tea,indian"
     };
   </script>
 
-  <!-- DONNÉES (DATA) -->
+  <!-- DONNÉES (DATA) - TON MENU COMPLET MODIFIÉ -->
   <script>
     const DATA = [
       {
@@ -119,7 +143,6 @@
           { name: "Champignons omelette avec salade", price: 4.90 }
         ]
       },
-
       {
         category: "Plats Tandoori",
         note: "Mariné aux épices et yaourt, grillé au four tandoor (servi avec salade)",
@@ -137,102 +160,76 @@
           { name: "Sheek kebab", price: 8.90 }
         ]
       },
-
-      {
-        category: "Recommandation du chef",
-        items: [
-          { name: "Shikora tikka poulet", price: 8.50, desc: "Tranches de citron du Bangladesh, herbes, en sauce" },
-          { name: "Shikora tikka agneau", price: 9.50 },
-          { name: "Poulet tikka miel", price: 8.50 },
-          { name: "Agneau tikka miel", price: 9.50 },
-          { name: "Gingembre poulet tikka", price: 10.50 },
-          { name: "Gingembre agneau", price: 10.50 },
-          { name: "Poisson mix bhuna", price: 9.50, desc: "Crevettes, saint-jacques, chou-fleur, pommes de terre, oignons" },
-          { name: "Dorade bhuna", price: 8.90 },
-          { name: "Poulet bazon", price: 9.50 },
-          { name: "Agneau tikka rezala", price: 9.50 },
-          { name: "Menthe poulet tikka", price: 8.50 },
-          { name: "Menthe agneau tikka", price: 9.50 },
-          { name: "Poulet tikka tamarin", price: 8.50 },
-          { name: "Agneau tikka tamarin (Spécialité du chef)", price: 12.00 },
-          { name: "Sally poulet", price: 8.90 },
-          { name: "Poulet tikka jaipur", price: 9.50 },
-          { name: "Agneau tikka jaipur", price: 10.50 }
-        ]
-      },
-
-      {
-        category: "Plats principaux",
-        subcategories: [
-          {
-            name: "Tandoori masala",
-            items: [
-              { name: "Chicken tikka masala", price: 8.50 },
-              { name: "Poulet tandoori masala", price: 8.50 },
-              { name: "Gambas masala", price: 12.00 },
-              { name: "Crevettes masala", price: 10.00 },
-              { name: "Agneau tikka masala", price: 9.50 },
-              { name: "Légumes masala", price: 8.00 },
-              { name: "Butter agneau tikka", price: 10.50 },
-              { name: "Butter chicken tikka", price: 9.50 },
-              { name: "Canard tikka masala", price: 10.50 }
-            ]
-          },
-          {
-            name: "Passanda (crémeux, doux)",
-            items: [
-              { name: "Poulet tikka passanda", price: 9.50 },
-              { name: "Agneau tikka passanda", price: 10.50 }
-            ]
-          },
-          {
-            name: "Kurma (très doux, lait coco, amandes)",
-            items: [
-              { name: "Poulet tikka kurma", price: 8.50 },
-              { name: "Poulet kurma", price: 8.00 },
-              { name: "Agneau tikka kurma", price: 9.00 },
-              { name: "Agneau kurma", price: 9.00 },
-              { name: "Canard tikka kurma", price: 10.50 },
-              { name: "Canard kurma", price: 9.50 },
-              { name: "Légumes kurma", price: 8.00 },
-              { name: "Crevettes kurma", price: 9.00 },
-              { name: "Gambas tikka kurma", price: 12.00 },
-              { name: "Gambas kurma", price: 10.00 }
-            ]
-          },
-          {
-            name: "Chicken curry (moyennement épicé)",
-            items: [
-              { name: "Poulet tikka curry", price: 8.50 },
-              { name: "Poulet curry", price: 8.00 },
-              { name: "Agneau tikka curry", price: 9.50 },
-              { name: "Agneau curry", price: 9.00 },
-              { name: "Canard tikka curry", price: 10.50 },
-              { name: "Canard curry", price: 9.50 },
-              { name: "Légumes curry", price: 7.50 },
-              { name: "Crevettes curry", price: 9.00 },
-              { name: "Gambas tikka curry", price: 12.00 },
-              { name: "Gambas curry", price: 10.00 }
-            ]
-          },
-          {
-            name: "Plats Rogan",
-            items: [
-              { name: "Poulet tikka rogan", price: 8.50 },
-              { name: "Poulet rogan", price: 8.00 },
-              { name: "Agneau tikka rogan", price: 9.50 },
-              { name: "Agneau rogan", price: 9.00 },
-              { name: "Canard tikka rogan", price: 10.50 },
-              { name: "Canard rogan", price: 9.50 },
-              { name: "Légumes rogan", price: 7.50 },
-              { name: "Crevettes rogan", price: 9.00 },
-              { name: "Gambas tikka rogan", price: 12.00 },
-              { name: "Gambas rogan", price: 10.00 }
-            ]
-          }
-        ]
-      },
-
+      { category: "Recommandation du chef", items: [
+        { name: "Shikora tikka poulet", price: 8.50, desc: "Tranches de citron du Bangladesh, herbes, en sauce" },
+        { name: "Shikora tikka agneau", price: 9.50 },
+        { name: "Poulet tikka miel", price: 8.50 },
+        { name: "Agneau tikka miel", price: 9.50 },
+        { name: "Gingembre poulet tikka", price: 10.50 },
+        { name: "Gingembre agneau", price: 10.50 },
+        { name: "Poisson mix bhuna", price: 9.50, desc: "Crevettes, saint-jacques, chou-fleur, pommes de terre, oignons" },
+        { name: "Dorade bhuna", price: 8.90 },
+        { name: "Poulet bazon", price: 9.50 },
+        { name: "Agneau tikka rezala", price: 9.50 },
+        { name: "Menthe poulet tikka", price: 8.50 },
+        { name: "Menthe agneau tikka", price: 9.50 },
+        { name: "Poulet tikka tamarin", price: 8.50 },
+        { name: "Agneau tikka tamarin (Spécialité du chef)", price: 12.00 },
+        { name: "Sally poulet", price: 8.90 },
+        { name: "Poulet tikka jaipur", price: 9.50 },
+        { name: "Agneau tikka jaipur", price: 10.50 }
+      ]},
+      { category: "Tandoori masala", items: [
+        { name: "Chicken tikka masala", price: 8.50 },
+        { name: "Poulet tandoori masala", price: 8.50 },
+        { name: "Gambas masala", price: 12.00 },
+        { name: "Crevettes masala", price: 10.00 },
+        { name: "Agneau tikka masala", price: 9.50 },
+        { name: "Légumes masala", price: 8.00 },
+        { name: "Butter agneau tikka", price: 10.50 },
+        { name: "Butter chicken tikka", price: 9.50 },
+        { name: "Canard tikka masala", price: 10.50 }
+      ]},
+      { category: "Passanda (crémeux, doux)", items: [
+        { name: "Poulet tikka passanda", price: 9.50 },
+        { name: "Agneau tikka passanda", price: 10.50 }
+      ]},
+      { category: "Kurma (très doux, lait coco, amandes)", items: [
+        { name: "Poulet tikka kurma", price: 8.50 },
+        { name: "Poulet kurma", price: 8.00 },
+        { name: "Agneau tikka kurma", price: 9.00 },
+        { name: "Agneau kurma", price: 9.00 },
+        { name: "Canard tikka kurma", price: 10.50 },
+        { name: "Canard kurma", price: 9.50 },
+        { name: "Légumes kurma", price: 8.00 },
+        { name: "Crevettes kurma", price: 9.00 },
+        { name: "Gambas tikka kurma", price: 12.00 },
+        { name: "Gambas kurma", price: 10.00 }
+      ]},
+      { category: "Chicken curry (moyennement épicé)", items: [
+        { name: "Poulet tikka curry", price: 8.50 },
+        { name: "Poulet curry", price: 8.00 },
+        { name: "Agneau tikka curry", price: 9.50 },
+        { name: "Agneau curry", price: 9.00 },
+        { name: "Canard tikka curry", price: 10.50 },
+        { name: "Canard curry", price: 9.50 },
+        { name: "Légumes curry", price: 7.50 },
+        { name: "Crevettes curry", price: 9.00 },
+        { name: "Gambas tikka curry", price: 12.00 },
+        { name: "Gambas curry", price: 10.00 }
+      ]},
+      { category: "Plats Rogan", items: [
+        { name: "Poulet tikka rogan", price: 8.50 },
+        { name: "Poulet rogan", price: 8.00 },
+        { name: "Agneau tikka rogan", price: 9.50 },
+        { name: "Agneau rogan", price: 9.00 },
+        { name: "Canard tikka rogan", price: 10.50 },
+        { name: "Canard rogan", price: 9.50 },
+        { name: "Légumes rogan", price: 7.50 },
+        { name: "Crevettes rogan", price: 9.00 },
+        { name: "Gambas tikka rogan", price: 12.00 },
+        { name: "Gambas rogan", price: 10.00 }
+      ]},
       { category: "Dopiaza", items: [
         { name: "Poulet tikka dopiaza", price: 8.50 },
         { name: "Poulet dopiaza", price: 8.00 },
@@ -245,7 +242,6 @@
         { name: "Gambas tikka dopiaza", price: 12.00 },
         { name: "Gambas dopiaza", price: 10.00 }
       ]},
-
       { category: "Dansak (lentilles, aigre-doux)", items: [
         { name: "Poulet tikka dansak", price: 9.50 },
         { name: "Poulet dansak", price: 9.00 },
@@ -258,7 +254,6 @@
         { name: "Gambas tikka dansak", price: 12.00 },
         { name: "Gambas dansak", price: 11.00 }
       ]},
-
       { category: "Pathia (aigre-doux, pimenté)", items: [
         { name: "Poulet tikka pathia", price: 9.50 },
         { name: "Poulet pathia", price: 9.00 },
@@ -271,7 +266,6 @@
         { name: "Gambas tikka pathia", price: 12.00 },
         { name: "Gambas pathia", price: 10.00 }
       ]},
-
       { category: "Épinards (saag)", items: [
         { name: "Poulet tikka épinard", price: 8.50 },
         { name: "Poulet épinard", price: 8.00 },
@@ -284,7 +278,6 @@
         { name: "Gambas tikka épinard", price: 12.00 },
         { name: "Gambas épinard", price: 10.00 }
       ]},
-
       { category: "Jalfrezi (poivrons, piments verts)", items: [
         { name: "Poulet tikka jalfrezi", price: 8.50 },
         { name: "Poulet jalfrezi", price: 8.00 },
@@ -297,7 +290,6 @@
         { name: "Gambas tikka jalfrezi", price: 12.00 },
         { name: "Gambas jalfrezi", price: 10.00 }
       ]},
-
       { category: "Plats Korai", items: [
         { name: "Poulet tikka korai", price: 8.50 },
         { name: "Poulet korai", price: 8.00 },
@@ -310,7 +302,6 @@
         { name: "Gambas tikka korai", price: 12.00 },
         { name: "Gambas korai", price: 10.00 }
       ]},
-
       { category: "Plats Vindaloo (très pimenté)", items: [
         { name: "Poulet tikka vindaloo", price: 8.50 },
         { name: "Poulet vindaloo", price: 8.00 },
@@ -323,7 +314,6 @@
         { name: "Gambas tikka vindaloo", price: 12.00 },
         { name: "Gambas vindaloo", price: 10.00 }
       ]},
-
       { category: "Plats Biryani (servi avec sauce curry)", items: [
         { name: "Poulet tikka biryani", price: 9.50 },
         { name: "Poulet biryani", price: 9.00 },
@@ -336,7 +326,6 @@
         { name: "Gambas biryani", price: 11.00 },
         { name: "Mix spécial biryani (4 poulet, 4 agneau, 1 gambas)", price: 15.00 }
       ]},
-
       { category: "Plats Balti (tomates, coriandre, épices)", items: [
         { name: "Poulet tikka balti", price: 8.50 },
         { name: "Poulet balti", price: 8.00 },
@@ -344,7 +333,6 @@
         { name: "Agneau balti", price: 9.00 },
         { name: "Canard tikka balti", price: 10.50 }
       ]},
-
       { category: "Pains maison", items: [
         { name: "Nan", price: 2.00 },
         { name: "Nan au fromage", price: 3.00 },
@@ -359,42 +347,38 @@
         { name: "Tandoori pains", price: 2.50 },
         { name: "Chappati", price: 2.00 }
       ]},
-
-      { category: "Riz basmati & accompagnements", subcategories: [
-        { name: "Riz basmati", items: [
-          { name: "Riz nature", price: 3.00 },
-          { name: "Riz pulao basmati", price: 3.50 },
-          { name: "Riz frit à l’oignon", price: 4.50 },
-          { name: "Riz frit spécial petits pois", price: 4.50 },
-          { name: "Riz aux légumes", price: 4.50 },
-          { name: "Riz frit aux champignons", price: 4.50 },
-          { name: "Riz au citron", price: 3.50 },
-          { name: "Riz aux œufs frits", price: 4.50 },
-          { name: "Riz aloo à l’ail", price: 4.50 },
-          { name: "Riz à la noix de coco sucré", price: 3.50 },
-          { name: "Frites", price: 3.00 }
-        ]},
-        { name: "Accompagnements légumes", items: [
-          { name: "Curry de légumes", price: 4.90 },
-          { name: "Poêlée de légumes", price: 4.90 },
-          { name: "Poêlée de champignons", price: 4.90 },
-          { name: "Poêlée de chou-fleur", price: 4.90 },
-          { name: "Dhall Sambar", price: 4.90 },
-          { name: "Pommes de terre Bombay", price: 4.90 },
-          { name: "Bhindi Bhaji", price: 4.90 },
-          { name: "Tarka Dhall", price: 4.90 },
-          { name: "Chana Massala", price: 4.90 },
-          { name: "Aloo gobi", price: 4.90 },
-          { name: "Chana Aloo", price: 4.90 },
-          { name: "Chana Sag", price: 4.90 },
-          { name: "Sag Bhaji", price: 4.90 },
-          { name: "Moutor paneer", price: 4.90 },
-          { name: "Sag Paneer", price: 4.90 },
-          { name: "Sag Aloo", price: 4.90 },
-          { name: "Tarka Sag Dall", price: 4.90 }
-        ]}
+      { category: "Riz basmati", items: [
+        { name: "Riz nature", price: 3.00 },
+        { name: "Riz pulao basmati", price: 3.50 },
+        { name: "Riz frit à l’oignon", price: 4.50 },
+        { name: "Riz frit spécial petits pois", price: 4.50 },
+        { name: "Riz aux légumes", price: 4.50 },
+        { name: "Riz frit aux champignons", price: 4.50 },
+        { name: "Riz au citron", price: 3.50 },
+        { name: "Riz aux œufs frits", price: 4.50 },
+        { name: "Riz aloo à l’ail", price: 4.50 },
+        { name: "Riz à la noix de coco sucré", price: 3.50 },
+        { name: "Frites", price: 3.00 }
       ]},
-
+      { category: "Accompagnements légumes", items: [
+        { name: "Curry de légumes", price: 4.90 },
+        { name: "Poêlée de légumes", price: 4.90 },
+        { name: "Poêlée de champignons", price: 4.90 },
+        { name: "Poêlée de chou-fleur", price: 4.90 },
+        { name: "Dhall Sambar", price: 4.90 },
+        { name: "Pommes de terre Bombay", price: 4.90 },
+        { name: "Bhindi Bhaji", price: 4.90 },
+        { name: "Tarka Dhall", price: 4.90 },
+        { name: "Chana Massala", price: 4.90 },
+        { name: "Aloo gobi", price: 4.90 },
+        { name: "Chana Aloo", price: 4.90 },
+        { name: "Chana Sag", price: 4.90 },
+        { name: "Sag Bhaji", price: 4.90 },
+        { name: "Moutor paneer", price: 4.90 },
+        { name: "Sag Paneer", price: 4.90 },
+        { name: "Sag Aloo", price: 4.90 },
+        { name: "Tarka Sag Dall", price: 4.90 }
+      ]},
       { category: "Chicken madras (un peu pimenté) — base sauce madras", items: [
         { name: "Poulet tikka madras", price: 8.50 },
         { name: "Poulet madras", price: 8.00 },
@@ -407,7 +391,21 @@
         { name: "Gambas tikka madras", price: 12.00 },
         { name: "Gambas madras", price: 10.00 }
       ]},
-
+      {category: "Boissons froides",items: [
+        { name: "Coca-Cola 33cl", price: 2.00 },
+        { name: "Coca-Cola zéro 33cl", price: 2.00 }, 
+        { name: "Fanta orange 33cl", price: 2.00 }, 
+        { name: "Oasis tropical 33cl", price: 2.00 }, 
+        { name: "Ice tea pêche 33cl", price: 2.00 }, 
+        { name: "Eau minérale 50cl", price: 1.50 }, 
+        { name: "Bouteille eau gazeuse", price: 2.50 } 
+      ] },
+      {category: "Desserts",items: [ 
+        { name: "Gulab jamun (2 pcs)", price: 3.50, desc: "Boulettes sucrées indiennes au sirop" },
+        { name: "Halwa maison", price: 4.00, desc: "Dessert sucré à base de semoule" }, 
+        { name: "Cheesecake", price: 3.50 }, { name: "Tiramisu", price: 3.50 },
+        { name: "Carrotte Halwa", price: 3.50 }, { name: "Lassi sucré", price: 3.00 }, 
+        { name: "Lassi mangue", price: 3.50 }, { name: "Lassi rose", price: 3.50 } ] },
       { category: "Boissons chaudes", items: [
         { name: "Café", price: 2.00 },
         { name: "Thé à la menthe", price: 2.50 },
@@ -416,14 +414,16 @@
     ];
   </script>
 
-  <!-- RENDERER -->
+  <!-- RENDERER + SÉLECTION / QUANTITÉS / TOTAL / WHATSAPP -->
   <script>
     const menuEl = document.getElementById("menu");
     const searchEl = document.getElementById("search");
     const subcatEl = document.getElementById("subcategoryFilter");
-    const placeholder = "https://images.unsplash.com/photo-1604908176997-431f9a0c9b3f?q=80&w=1200&auto=format&fit=crop";
 
-    // remplir filtre sous-catégories
+    // ÉTAT DE SÉLECTION : key = id unique de l'item (pas le nom), val = { name, price, qty }
+    const selected = new Map();
+
+    // Remplir filtre sous-catégories (s'il y en a)
     const allSubcats = new Set();
     DATA.forEach(cat => { if (cat.subcategories) cat.subcategories.forEach(sc => allSubcats.add(sc.name)); });
     [...allSubcats].sort().forEach(name => {
@@ -431,7 +431,7 @@
       opt.value = name; opt.textContent = name; subcatEl.appendChild(opt);
     });
 
-    const formatPrice = p => `${p.toFixed(2).replace(".", ",")} €`;
+    const euro = n => `${n.toFixed(2).replace(".", ",")} €`;
 
     function sectionHeader(title, note){
       return `
@@ -442,21 +442,66 @@
     }
 
     function catImage(title){
-      const src = CATEGORY_IMAGES[title] || placeholder;
-      return `<div class="overflow-hidden rounded-xl border border-orange-100 mb-4">
-                <img loading="lazy" src="${src}" alt="${title}" class="w-full h-56 md:h-72 object-cover" onerror="this.src='${placeholder}'">
+      const src = CATEGORY_IMAGES[title] || "";
+      return `<div class="cat-image overflow-hidden rounded-xl border border-orange-100 mb-4">
+                <img loading="lazy" src="${src}" alt="${title}" class="w-full object-cover" onerror="this.remove()">
               </div>`;
     }
 
     function itemRow(item){
+      const id = `id_${Math.random().toString(36).slice(2,9)}`;
       return `
-        <div class="flex items-start justify-between py-2 border-b border-orange-50">
-          <div>
-            <p class="font-medium">${item.name}</p>
-            ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
+        <div class="flex items-center justify-between py-2 border-b border-orange-50 gap-3">
+          <div class="flex items-start gap-3">
+            <input id="${id}" type="checkbox" class="checkbox mt-1" data-name="${item.name.replaceAll('"','&quot;')}" data-price="${item.price}">
+            <label for="${id}" class="cursor-pointer">
+              <p class="font-medium">${item.name}</p>
+              ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
+            </label>
           </div>
-          <div class="price ml-4 whitespace-nowrap">${formatPrice(item.price)}</div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1" data-qty-box="${id}" style="display:none;">
+              <div class="qty-btn" data-action="minus" data-id="${id}">-</div>
+              <span id="qty_${id}">1</span>
+              <div class="qty-btn" data-action="plus" data-id="${id}">+</div>
+            </div>
+            <div class="price whitespace-nowrap">${euro(item.price)}</div>
+          </div>
         </div>`;
+    }
+
+    function attachHandlers(scopeEl){
+      // Checkbox
+      scopeEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const id = cb.id;
+          const name = cb.dataset.name;
+          const price = parseFloat(cb.dataset.price || "0");
+          const qtyBox = scopeEl.querySelector(`[data-qty-box="${id}"]`);
+          if (cb.checked){
+            selected.set(id, { name, price, qty: 1 });
+            if (qtyBox) qtyBox.style.display = "flex";
+          } else {
+            selected.delete(id);
+            if (qtyBox) qtyBox.style.display = "none";
+          }
+          updateTotal();
+        });
+      });
+
+      // Boutons +/-
+      scopeEl.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const item = selected.get(id);
+          if (!item) return;
+          if (btn.dataset.action === "plus") item.qty++;
+          if (btn.dataset.action === "minus" && item.qty > 1) item.qty--;
+          const qtyEl = scopeEl.querySelector(`#qty_${id}`);
+          if (qtyEl) qtyEl.textContent = item.qty;
+          updateTotal();
+        });
+      });
     }
 
     function render(data){
@@ -466,7 +511,6 @@
 
       data.forEach(cat => {
         let html = "";
-        // en-tête + image de catégorie
         html += sectionHeader(cat.category, cat.note);
         html += catImage(cat.category);
 
@@ -476,12 +520,12 @@
             const items = sc.items.filter(it => !q || it.name.toLowerCase().includes(q));
             if (!items.length) return;
             html += `<h3 class="mt-3 mb-2 text-lg font-semibold text-gray-800">${sc.name}</h3>`;
-            html += `<div class="card p-4 divide-y divide-orange-50">` + items.map(itemRow).join("") + `</div>`;
+            html += `<div class="card p-2 md:p-4 divide-y divide-orange-50">` + items.map(itemRow).join("") + `</div>`;
           });
         } else {
           const items = cat.items.filter(it => !q || it.name.toLowerCase().includes(q));
           if (items.length){
-            html += `<div class="card p-4 divide-y divide-orange-50">` + items.map(itemRow).join("") + `</div>`;
+            html += `<div class="card p-2 md:p-4 divide-y divide-orange-50">` + items.map(itemRow).join("") + `</div>`;
           }
         }
 
@@ -489,18 +533,58 @@
         wrap.className = "mb-12";
         wrap.innerHTML = html;
         menuEl.appendChild(wrap);
+        attachHandlers(wrap);
       });
+
+      updateTotal();
     }
 
+    // Barre fixe (nom client + total + bouton WhatsApp)
+    const bar = document.createElement('div');
+    bar.className = 'sticky-bar';
+    bar.innerHTML = `
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+        <div class="flex-1 flex items-center gap-2">
+          <label for="clientName" class="text-sm text-gray-700 whitespace-nowrap">Nom du client :</label>
+          <input id="clientName" type="text" placeholder="ex. Karim" class="flex-1 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300" />
+        </div>
+        <div id="orderTotal" class="text-lg font-semibold text-gray-900">Total : 0,00 €</div>
+        <a id="sendWhatsApp" href="#" class="px-5 py-3 rounded-xl bg-green-600 text-white font-semibold text-center md:min-w-[280px]">💬 Envoyer la commande sur WhatsApp</a>
+      </div>`;
+    document.body.appendChild(bar);
+
+    function calcTotal(){
+      let total = 0;
+      for (const item of selected.values()){ total += item.price * item.qty; }
+      return total;
+    }
+
+    function updateTotal(){
+      document.getElementById("orderTotal").textContent = "Total : " + euro(calcTotal());
+    }
+
+    document.getElementById("sendWhatsApp").addEventListener("click", e => {
+      e.preventDefault();
+      if (selected.size === 0){
+        alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
+        return;
+      }
+      const name = (document.getElementById("clientName").value || "").trim();
+      let msg = `Bonjour Curry House,%0A`;
+      msg += name ? `Commande de ${name}%0A%0A` : "Commande:%0A%0A";
+      for (const item of selected.values()){
+        msg += `- ${item.name} x${item.qty} (${euro(item.price*item.qty)})%0A`;
+      }
+      msg += `%0ATotal : ${euro(calcTotal())}`;
+      window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
+    });
+
+    // Filtres
     searchEl.addEventListener("input", () => render(DATA));
     subcatEl.addEventListener("change", () => render(DATA));
+
+    // Premier rendu
     render(DATA);
   </script>
-
-  <!-- Boutons mobile (côte à côte) -->
-  <div class="fixed bottom-3 inset-x-0 flex justify-center gap-2 md:hidden z-40 px-4">
-    <a href="tel:0983036692" class="flex-1 text-center px-4 py-3 rounded-full bg-orange-600 text-white font-semibold shadow-lg">📞 Appeler</a>
-    <a href="https://wa.me/33763424110" target="_blank" class="flex-1 text-center px-4 py-3 rounded-full bg-green-600 text-white font-semibold shadow-lg">💬 WhatsApp</a>
-  </div>
 </body>
 </html>
