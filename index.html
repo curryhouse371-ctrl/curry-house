@@ -586,5 +586,40 @@
     // Premier rendu
     render(DATA);
   </script>
+  <script>
+  document.getElementById("orderType").addEventListener("change", e => {
+    document.getElementById("surPlaceFields").classList.toggle("hidden", e.target.value !== "Sur place");
+  });
+
+  document.getElementById("sendWhatsApp").addEventListener("click", e => {
+    e.preventDefault();
+    if (selected.size === 0){
+      alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
+      return;
+    }
+
+    const name = (document.getElementById("clientName").value || "").trim();
+    const type = document.getElementById("orderType").value;
+    const arrival = document.getElementById("arrivalTime").value;
+    const persons = document.getElementById("personCount").value;
+
+    let msg = `Bonjour Curry House,%0A`;
+    msg += name ? `Commande de ${name}%0A` : "Commande:%0A";
+    msg += `Type de commande : ${type}%0A`;
+
+    if (type === "Sur place") {
+      if (arrival) msg += `Heure d’arrivée : ${arrival}%0A`;
+      if (persons) msg += `Nombre de personnes : ${persons}%0A`;
+    }
+
+    msg += `%0APlats :%0A`;
+    for (const item of selected.values()) {
+      msg += `- ${item.name} x${item.qty} (${(item.price*item.qty).toFixed(2).replace(".", ",")} €)%0A`;
+    }
+    msg += `%0A🔸 Total : ${(calcTotal()).toFixed(2).replace(".", ",")} €`;
+
+    window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
+  });
+</script>
 </body>
 </html>
