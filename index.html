@@ -540,8 +540,11 @@
     }
 
     // Barre fixe (nom client + total + bouton WhatsApp)
-  <!-- NOUVELLE BARRE STICKY -->
-<div class="sticky-bar">
+ 
+       // Barre fixe (nom client + total + bouton WhatsApp)
+const bar = document.createElement('div');
+bar.className = 'sticky-bar';
+bar.innerHTML = `
   <div class="max-w-6xl mx-auto px-4 py-3 grid gap-3 md:flex md:items-end md:justify-between">
     <div class="flex flex-col md:flex-row gap-2 md:items-center flex-wrap w-full">
       <label class="text-sm text-gray-700 whitespace-nowrap">Type de commande :</label>
@@ -567,9 +570,9 @@
       <div id="orderTotal" class="text-lg font-semibold text-gray-900">Total : 0,00 €</div>
       <a id="sendWhatsApp" href="#" class="px-5 py-3 rounded-xl bg-green-600 text-white font-semibold text-center md:min-w-[280px]">💬 Envoyer la commande sur WhatsApp</a>
     </div>
-  </div>
-</div>
-;
+  </div>`;
+document.body.appendChild(bar);
+
 
     function calcTotal(){
       let total = 0;
