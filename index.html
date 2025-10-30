@@ -585,20 +585,29 @@ document.body.appendChild(bar);
     }
 
     document.getElementById("sendWhatsApp").addEventListener("click", e => {
-      e.preventDefault();
-      if (selected.size === 0){
-        alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
-        return;
-      }
-      const name = (document.getElementById("clientName").value || "").trim();
-      let msg = `Bonjour Curry House,%0A`;
-      msg += name ? `Commande de ${name}%0A%0A` : "Commande:%0A%0A";
-      for (const item of selected.values()){
-        msg += `- ${item.name} x${item.qty} (${euro(item.price*item.qty)})%0A`;
-      }
-      msg += `%0ATotal : ${euro(calcTotal())}`;
-      window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
-    });
+  e.preventDefault();
+
+  const name = (document.getElementById("clientName").value || "").trim();
+  const type = document.getElementById("orderType").value;
+  const arrival = document.getElementById("arrivalTime").value;
+  const persons = document.getElementById("personCount").value;
+
+  let msg = `Bonjour Curry House,%0A`;
+  msg += name ? `Commande de ${name}%0A` : "";
+  msg += `Type de commande : ${type}%0A`;
+
+  // 👉 Ajout de ces lignes pour afficher les champs “sur place”
+  if (type === "Sur place") {
+    if (arrival) msg += `Heure d’arrivée : ${arrival}%0A`;
+    if (persons) msg += `Nombre de personnes : ${persons}%0A`;
+  }
+
+  // Ici, tu peux aussi rajouter le détail des plats si tu veux
+  msg += `%0A🔸 Total : ${(calcTotal ? calcTotal().toFixed(2).replace(".", ",") : "0,00")} €`;
+
+  window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
+});
+
 
     // Filtres
     searchEl.addEventListener("input", () => render(DATA));
