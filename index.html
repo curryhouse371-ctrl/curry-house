@@ -597,10 +597,12 @@ document.body.appendChild(bar);
 });
 
   // Filtres 
-    searchEl.addEventListener("input", () => render(DATA)); 
-    subcatEl.addEventListener("change", () => render(DATA)); 
-    // Premier rendu
-    render(DATA);
+  searchEl.addEventListener("input", () => render(DATA)); 
+  subcatEl.addEventListener("change", () => render(DATA)); 
+
+  // Premier rendu
+  render(DATA);
+});
   </script>
   <script>
   document.getElementById("orderType").addEventListener("change", e => {
