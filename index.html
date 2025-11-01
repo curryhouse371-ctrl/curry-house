@@ -596,13 +596,13 @@ document.body.appendChild(bar);
   
 });
 
-    // Filtres
-    searchEl.addEventListener("input", () => render(DATA));
-    subcatEl.addEventListener("change", () => render(DATA));
-    render(DATA);
+   // Initialisation de l'affichage au chargement de la page
+document.addEventListener("DOMContentLoaded", () => {
+  searchEl.addEventListener("input", () => render(DATA));
+  subcatEl.addEventListener("change", () => render(DATA));
+  render(DATA);
+});
 
-    // Premier rendu
-    render(DATA);
   </script>
   <script>
   document.getElementById("orderType").addEventListener("change", e => {
@@ -639,7 +639,6 @@ document.body.appendChild(bar);
     window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
   });
     // Ne pas oublier d’appeler render une fois la page chargée
-render(DATA);
 </script>
 </body>
 </html>
