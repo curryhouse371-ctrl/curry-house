@@ -596,7 +596,8 @@ document.body.appendChild(bar);
   
 });
 
-  // Filtres 
+  // Filtres
+  document.addEventListener("DOMContentLoaded", () => {
   searchEl.addEventListener("input", () => render(DATA)); 
   subcatEl.addEventListener("change", () => render(DATA)); 
 
