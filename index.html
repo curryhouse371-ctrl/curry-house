@@ -596,13 +596,11 @@ document.body.appendChild(bar);
   
 });
 
-   // Initialisation de l'affichage au chargement de la page
-document.addEventListener("DOMContentLoaded", () => {
-  searchEl.addEventListener("input", () => render(DATA));
-  subcatEl.addEventListener("change", () => render(DATA));
-  render(DATA);
-});
-
+  // Filtres 
+    searchEl.addEventListener("input", () => render(DATA)); 
+    subcatEl.addEventListener("change", () => render(DATA)); 
+    // Premier rendu
+    render(DATA);
   </script>
   <script>
   document.getElementById("orderType").addEventListener("change", e => {
