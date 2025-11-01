@@ -560,21 +560,9 @@ bar.innerHTML = `
       <select id="orderType" class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300">
         <option value="Livraison">Livraison</option>
         <option value="À emporter">À emporter</option>
-        <option value="Sur place">Sur place</option>
       </select>
 
-      <div id="surPlaceFields" class="hidden flex flex-wrap gap-3 items-center">
-        <label class="text-sm text-gray-700">Heure d’arrivée :</label>
-        <input id="arrivalTime" type="time" class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300" />
-
-        <label class="text-sm text-gray-700">Nombre de personnes :</label>
-        <input id="personCount" type="number" min="1" class="w-20 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300" />
-      </div>
-
-      <label for="clientName" class="text-sm text-gray-700 whitespace-nowrap">Nom du client :</label>
-      <input id="clientName" type="text" placeholder="ex. Karim" class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300" />
-    </div>
-
+     
     <div class="flex items-center gap-3">
       <div id="orderTotal" class="text-lg font-semibold text-gray-900">Total : 0,00 €</div>
       <a id="sendWhatsApp" href="#" class="px-5 py-3 rounded-xl bg-green-600 text-white font-semibold text-center md:min-w-[280px]">💬 Envoyer la commande sur WhatsApp</a>
@@ -604,9 +592,6 @@ document.body.appendChild(bar);
 
   </script>
   <script>
-  document.getElementById("orderType").addEventListener("change", e => {
-    document.getElementById("surPlaceFields").classList.toggle("hidden", e.target.value !== "Sur place");
-  });
 
   document.getElementById("sendWhatsApp").addEventListener("click", e => {
     e.preventDefault();
@@ -624,10 +609,7 @@ document.body.appendChild(bar);
     msg += name ? `Commande de ${name}%0A` : "Commande:%0A";
     msg += `Type de commande : ${type}%0A`;
 
-    if (type === "Sur place") {
-      if (arrival) msg += `Heure d’arrivée : ${arrival}%0A`;
-      if (persons) msg += `Nombre de personnes : ${persons}%0A`;
-    }
+
 
     msg += `%0APlats :%0A`;
     for (const item of selected.values()) {
