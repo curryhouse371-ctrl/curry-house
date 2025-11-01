@@ -551,10 +551,6 @@
 
       updateTotal();
     }
-
-    // Barre fixe (nom client + total + bouton WhatsApp)
- 
-       // Barre fixe (nom client + total + bouton WhatsApp)
 const bar = document.createElement('div');
 bar.className = 'sticky-bar';
 bar.innerHTML = `
@@ -641,6 +637,8 @@ document.body.appendChild(bar);
 
     window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
   });
+    // Ne pas oublier d’appeler render une fois la page chargée
+render(DATA);
 </script>
 </body>
 </html>
