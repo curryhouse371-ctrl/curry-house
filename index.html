@@ -617,7 +617,7 @@ document.body.appendChild(bar);
       alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
       return;
     }
-
+  const name = prompt("Quel est votre nom ?") || "";
   const type = document.getElementById("orderType").value;
   let msg = `Bonjour Curry House,%0A`;
     
