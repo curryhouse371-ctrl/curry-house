@@ -353,18 +353,7 @@
         { name: "Gambas tikka balti", price: 13.00 },
         { name: "Gambas balti", price: 12.00 }
       ]},
-       { category: "Madras: jus de citron et piment ++ ", items: [
-        { name: "Poulet tikka madras", price: 9.90 },
-        { name: "Poulet madras", price: 9.00 },
-        { name: "Agneau tikka madras", price: 10.90 },
-        { name: "Agneau madras", price: 10.00 },
-        { name: "Canard tikka madras", price: 12.90 },
-        { name: "Canard madras", price: 11.50 },
-        { name: "Légumes madras", price: 8.50 },
-        { name: "Crevettes madras", price: 9.90 },
-        { name: "Gambas tikka madras", price: 13.00 },
-        { name: "Gambas madras", price: 12.00 }
-      ]},
+      
       { category: "Pains maison", items: [
         { name: "Nan", price: 2.00 },
         { name: "Nan au fromage", price: 3.00 },
@@ -378,6 +367,18 @@
         { name: "Naan Fromage Garlic", price: 3.50 },
         { name: "Tandoori pains", price: 2.50 },
         { name: "Chappati", price: 2.00 }
+      ]},
+       { category: "Madras: jus de citron et piment ++ ", items: [
+        { name: "Poulet tikka madras", price: 9.90 },
+        { name: "Poulet madras", price: 9.00 },
+        { name: "Agneau tikka madras", price: 10.90 },
+        { name: "Agneau madras", price: 10.00 },
+        { name: "Canard tikka madras", price: 12.90 },
+        { name: "Canard madras", price: 11.50 },
+        { name: "Légumes madras", price: 8.50 },
+        { name: "Crevettes madras", price: 9.90 },
+        { name: "Gambas tikka madras", price: 13.00 },
+        { name: "Gambas madras", price: 12.00 }
       ]},
       { category: "Riz basmati", items: [
         { name: "Riz nature", price: 3.00 },
@@ -479,28 +480,42 @@
                 <img loading="lazy" src="${src}" alt="${title}" class="w-full object-cover" onerror="this.remove()">
               </div>`;
     }
+ function itemRow(item, catIndex, itemIndex) {
+  const id = `item_${catIndex}_${itemIndex}`;
 
-    function itemRow(item){
-      const id = `id_${Math.random().toString(36).slice(2,9)}`;
-      return `
-        <div class="flex items-center justify-between py-2 border-b border-orange-50 gap-3">
-          <div class="flex items-start gap-3">
-            <input id="${id}" type="checkbox" class="checkbox mt-1" data-name="${item.name.replaceAll('"','&quot;')}" data-price="${item.price}">
-            <label for="${id}" class="cursor-pointer">
-              <p class="font-medium">${item.name}</p>
-              ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
-            </label>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1" data-qty-box="${id}" style="display:none;">
-              <div class="qty-btn" data-action="minus" data-id="${id}">-</div>
-              <span id="qty_${id}">1</span>
-              <div class="qty-btn" data-action="plus" data-id="${id}">+</div>
-            </div>
-            <div class="price whitespace-nowrap">${euro(item.price)}</div>
-          </div>
-        </div>`;
-    }
+  // Gestion des sauts manuels
+  if (globalIndex === 7) globalIndex = 9;     // saute 7 et 8
+  if (globalIndex === 45) globalIndex = 46;   // saute 45
+  if (globalIndex === 62) globalIndex = 63;   // saute 62
+  if (globalIndex === 237) globalIndex = 241; // saute 237 à 240
+
+  const displayIndex = globalIndex++;
+  return `
+    <div class="flex items-center justify-between py-2 border-b border-orange-50 gap-3">
+      <div class="flex items-start gap-3">
+        <input
+          id="${id}"
+          type="checkbox"
+          class="checkbox mt-1"
+          data-name="${item.name.replace(/"/g,'&quot;')}"
+          data-price="${item.price}"
+        >
+        <label for="${id}" class="cursor-pointer">
+          <p class="font-medium">${displayIndex}. ${item.name}</p>
+          ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
+        </label>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1" data-qty-box="${id}" style="display:none;">
+          <div class="qty-btn" data-action="minus" data-id="${id}">-</div>
+          <span id="qty_${id}">1</span>
+          <div class="qty-btn" data-action="plus" data-id="${id}">+</div>
+        </div>
+        <div class="price whitespace-nowrap">${euro(item.price)}</div>
+      </div>
+    </div>`;
+}
+
 
     function attachHandlers(scopeEl){
       // Checkbox
