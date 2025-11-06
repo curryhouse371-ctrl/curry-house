@@ -767,8 +767,7 @@ orderTypeEl.addEventListener("change", () => {
 });
 
  
-
-// === Envoi WhatsApp (100% compatible mobile) ===
+// === Envoi WhatsApp (avec délai 45 min minimum) ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
@@ -796,10 +795,25 @@ sendBtn.addEventListener("click", e => {
 
   if (!name) return alert("Merci d’indiquer le nom du client.");
   if (!orderType) return alert("Merci de choisir le type de commande.");
-  if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
-    return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
 
-  // Construction du message brut
+  // ⚠️ Vérification délai minimum 45 minutes
+  if (orderType === "Sur place") {
+    if (!arrivalTime || !peopleCount)
+      return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
+
+    const now = new Date();
+    const [h, m] = arrivalTime.split(":").map(Number);
+    const arrival = new Date();
+    arrival.setHours(h, m, 0, 0);
+
+    const diffMin = (arrival - now) / 60000; // différence en minutes
+
+    if (diffMin < 45) {
+      return alert("⚠️ Merci de réserver au moins 45 minutes à l’avance pour une commande sur place.");
+    }
+  }
+
+  // Construction du message
   let msg = `Bonjour Curry House,\n`;
   msg += `Commande de ${name}\n`;
   msg += `Type de commande : ${orderType}\n`;
@@ -818,11 +832,11 @@ sendBtn.addEventListener("click", e => {
 
   msg += `\n🔸 Total : ${total.toFixed(2)} €`;
 
-  // ✅ Encodage propre pour WhatsApp mobile
   const encoded = encodeURIComponent(msg);
   const whatsappUrl = `https://wa.me/33763424110?text=${encoded}`;
   window.open(whatsappUrl, "_blank");
 });
+
 
 
 
