@@ -768,11 +768,11 @@ orderTypeEl.addEventListener("change", () => {
 
  
 
-// === Envoi WhatsApp (version robuste) ===
+// === Envoi WhatsApp (100% compatible mobile) ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
-  // On recrée la liste des plats directement depuis les cases cochées visibles dans le DOM
+  // On reconstruit les plats directement depuis les cases cochées
   const selectedItems = [];
   document.querySelectorAll("input.checkbox:checked").forEach(cb => {
     const id = cb.id;
@@ -781,7 +781,7 @@ sendBtn.addEventListener("click", e => {
     const numero = cb.dataset.numero;
     const qtyEl = document.querySelector(`#qty_${id}`);
     const qty = qtyEl ? parseInt(qtyEl.textContent) : 1;
-    selectedItems.push({ id, numero, name, price, qty });
+    selectedItems.push({ numero, name, price, qty });
   });
 
   if (selectedItems.length === 0) {
@@ -799,30 +799,31 @@ sendBtn.addEventListener("click", e => {
   if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
     return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
 
-  // Génération du message
-  let msg = `Bonjour Curry House,%0A`;
-  msg += `Commande de ${name}%0A`;
-  msg += `Type de commande : ${orderType}%0A`;
+  // Construction du message brut
+  let msg = `Bonjour Curry House,\n`;
+  msg += `Commande de ${name}\n`;
+  msg += `Type de commande : ${orderType}\n`;
   if (orderType === "Sur place") {
-    msg += `Heure d’arrivée : ${arrivalTime}%0A`;
-    msg += `Nombre de personnes : ${peopleCount}%0A`;
+    msg += `Heure d’arrivée : ${arrivalTime}\n`;
+    msg += `Nombre de personnes : ${peopleCount}\n`;
   }
-
-  msg += `%0A🍽️ *Plats sélectionnés :*%0A`;
+  msg += `\n🍽️ Plats sélectionnés :\n`;
 
   let total = 0;
   selectedItems.forEach(it => {
-    const lineTotal = (it.price * it.qty);
+    const lineTotal = it.price * it.qty;
     total += lineTotal;
-    msg += `#${it.numero} ${it.name} x${it.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
+    msg += `#${it.numero} ${it.name} x${it.qty} (${lineTotal.toFixed(2)} €)\n`;
   });
 
-  msg += `%0A🔸 *Total :* ${total.toFixed(2).replace(".", ",")} €`;
+  msg += `\n🔸 Total : ${total.toFixed(2)} €`;
 
-  // Envoi vers WhatsApp
-  const whatsappUrl = `https://wa.me/33763424110?text=${msg}`;
+  // ✅ Encodage propre pour WhatsApp mobile
+  const encoded = encodeURIComponent(msg);
+  const whatsappUrl = `https://wa.me/33763424110?text=${encoded}`;
   window.open(whatsappUrl, "_blank");
 });
+
 
 
 </script>
