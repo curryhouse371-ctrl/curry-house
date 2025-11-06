@@ -135,10 +135,7 @@
     placeholder="ex. 2"
     class="w-20 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
   />
-</div>
-
-        
-        
+</div> 
           <div class="flex items-center gap-3 mt-2 md:mt-0">
           <div id="orderTotal" class="text-lg font-semibold text-gray-900">
             Total : 0,00 €
@@ -769,11 +766,14 @@ orderTypeEl.addEventListener("change", () => {
   else dineInFields.classList.add("hidden");
 });
 
-  // === Envoi WhatsApp (corrigé et stabilisé) ===
+ 
+
+// === Envoi WhatsApp (corrigé final) ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
-  if (window.selected.size === 0) {
+  // Sécurité : s'assurer que window.selected existe et contient bien les plats
+  if (!window.selected || window.selected.size === 0) {
     alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
     return;
   }
@@ -788,7 +788,7 @@ sendBtn.addEventListener("click", e => {
   if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
     return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
 
-  // Message initial
+  // On régénère le message
   let msg = `Bonjour Curry House,%0A`;
   msg += `Commande de ${name}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
@@ -796,19 +796,24 @@ sendBtn.addEventListener("click", e => {
     msg += `Heure d’arrivée : ${arrivalTime}%0A`;
     msg += `Nombre de personnes : ${peopleCount}%0A`;
   }
-  msg += `%0APlats :%0A`;
 
-  // ✅ On convertit la Map en tableau pour éviter les pertes
-  const itemsArray = Array.from(window.selected.values());
-  itemsArray.forEach(it => {
+  msg += `%0A🍽️ *Plats sélectionnés :*%0A`;
+
+  const itemsArray = Array.from(window.selected.entries());
+  if (itemsArray.length === 0) {
+    alert("Erreur : aucun plat sélectionné n’a été détecté. Rechargez la page et réessayez.");
+    return;
+  }
+
+  itemsArray.forEach(([id, it]) => {
     const lineTotal = (it.price * it.qty).toFixed(2).replace(".", ",");
     msg += `#${it.numero} ${it.name} x${it.qty} (${lineTotal} €)%0A`;
   });
 
-  msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
+  msg += `%0A🔸 *Total :* ${calcTotal().toFixed(2).replace(".", ",")} €`;
 
-  // Envoi
   const whatsappUrl = `https://wa.me/33763424110?text=${msg}`;
   window.open(whatsappUrl, "_blank");
 });
+
 </script>
