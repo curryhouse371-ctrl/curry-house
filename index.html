@@ -841,7 +841,6 @@ orderTypeEl.addEventListener("change", () => {
   }
 });
 
-// Ajout dans le message WhatsApp
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
@@ -851,7 +850,6 @@ sendBtn.addEventListener("click", e => {
   }
 
   const name = (document.getElementById("clientName").value || "").trim();
-  const table = (document.getElementById("tableNumber").value || "").trim();
   const orderType = orderTypeEl.value;
   const arrivalTime = document.getElementById("arrivalTime").value;
   const peopleCount = document.getElementById("peopleCount").value;
@@ -872,7 +870,6 @@ sendBtn.addEventListener("click", e => {
   }
 
   let msg = `Bonjour Curry House,%0ACommande de ${name}%0A`;
-  if (table) msg += `Table : ${table}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
 
   if (orderType === "Sur place") {
@@ -890,6 +887,7 @@ sendBtn.addEventListener("click", e => {
   const url = `https://wa.me/33763424110?text=${msg}`;
   window.open(url, "_blank");
 });
+
 
   </script>
 </body>
