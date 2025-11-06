@@ -659,16 +659,18 @@ function itemRow(item, catIndex, itemIndex) {
 }
 
 // === Gestion des événements ===
-function attachHandlers(scopeEl) {
+
+  function attachHandlers(scopeEl) {
   scopeEl.querySelectorAll("input.checkbox").forEach(cb => {
     const id = cb.id;
     const name = cb.dataset.name;
     const price = parseFloat(cb.dataset.price || "0");
-    const numero = cb.dataset.numero;
+    const numero = cb.dataset.numero; // ✅ On récupère bien le numéro ici
     const qtyBox = scopeEl.querySelector(`[data-qty-box="${id}"]`);
 
     cb.addEventListener("change", e => {
       if (e.target.checked) {
+        // ✅ On enregistre bien le numéro, nom et prix
         selected.set(id, { numero, name, price, qty: 1 });
         qtyBox.style.display = "flex";
       } else {
@@ -679,6 +681,7 @@ function attachHandlers(scopeEl) {
     });
   });
 
+  // Gestion du + et - pour les quantités
   scopeEl.querySelectorAll(".qty-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
@@ -692,6 +695,7 @@ function attachHandlers(scopeEl) {
     });
   });
 }
+
 
 // === Rendu du menu ===
 function render(data) {
