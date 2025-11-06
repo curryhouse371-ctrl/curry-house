@@ -674,10 +674,10 @@ function itemRow(item, catIndex, itemIndex) {
     cb.addEventListener("change", e => {
       if (e.target.checked) {
         // ✅ On enregistre bien le numéro, nom et prix
-        selected.set(id, { numero, name, price, qty: 1 });
+        window.selected.set(id, { numero, name, price, qty: 1 });
         qtyBox.style.display = "flex";
       } else {
-        selected.delete(id);
+       window.selected.delete(id);
         qtyBox.style.display = "none";
       }
       updateTotal();
@@ -688,7 +688,7 @@ function itemRow(item, catIndex, itemIndex) {
   scopeEl.querySelectorAll(".qty-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
-      const item = selected.get(id);
+      const item = window.selected.get(id);
       if (!item) return;
       if (btn.dataset.action === "plus") item.qty++;
       if (btn.dataset.action === "minus" && item.qty > 1) item.qty--;
@@ -731,7 +731,7 @@ function render(data) {
 // === Calcul total ===
 function calcTotal() {
   let total = 0;
-  for (const item of selected.values()) total += item.price * item.qty;
+   for (const item of window.selected.values()) total += item.price * item.qty;
   return total;
 }
 
@@ -773,7 +773,7 @@ orderTypeEl.addEventListener("change", () => {
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
-  if (selected.size === 0) {
+  if (window.selected.size === 0) {
     alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
     return;
   }
@@ -799,7 +799,7 @@ sendBtn.addEventListener("click", e => {
   msg += `%0APlats :%0A`;
 
   // ✅ On convertit la Map en tableau pour éviter les pertes
-  const itemsArray = Array.from(selected.values());
+  const itemsArray = Array.from(window.selected.values());
   itemsArray.forEach(it => {
     const lineTotal = (it.price * it.qty).toFixed(2).replace(".", ",");
     msg += `#${it.numero} ${it.name} x${it.qty} (${lineTotal} €)%0A`;
