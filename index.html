@@ -628,7 +628,8 @@
     }
 
  function itemRow(item, catIndex, itemIndex) {
-  const id = `item_${catIndex}_${itemIndex}`;
+ const id = `item_${catIndex}_${itemIndex}`;
+const displayIndex = globalIndex++;
 
   // Gestion des sauts manuels
   if (globalIndex === 7) globalIndex = 9;     // saute 7 et 8
@@ -646,6 +647,7 @@
           class="checkbox mt-1"
           data-name="${item.name.replace(/"/g,'&quot;')}"
           data-price="${item.price}"
+          data-numero="${displayIndex}"
         >
         <label for="${id}" class="cursor-pointer">
           <p class="font-medium">${displayIndex}. ${item.name}</p>
@@ -671,6 +673,7 @@
         const id = cb.id;
         const name = cb.dataset.name;
         const price = parseFloat(cb.dataset.price || "0");
+        const numero = cb.dataset.numero;
         const qtyBox = scopeEl.querySelector(`[data-qty-box="${id}"]`);
         const qtyEl = scopeEl.querySelector(`#qty_${id}`);
 
@@ -684,7 +687,7 @@
 
         cb.addEventListener("change", e => {
           if (e.target.checked){
-            const current = selected.get(id) || { name, price, qty: 1 };
+           const current = selected.get(id) || { numero, name, price, qty: 1 };
             if (!current.qty) current.qty = 1;
             selected.set(id, current);
             if (qtyBox) qtyBox.style.display = "flex";
@@ -876,10 +879,11 @@ sendBtn.addEventListener("click", e => {
   }
 
   msg += `%0APlats :%0A`;
-  for (const item of selected.values()) {
-    const lineTotal = item.price * item.qty;
-    msg += `- ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
-  }
+for (const item of selected.values()) {
+  const lineTotal = item.price * item.qty;
+  msg += `#${item.numero} ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
+}
+
 
   msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
 
