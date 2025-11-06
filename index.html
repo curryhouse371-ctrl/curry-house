@@ -752,7 +752,6 @@ document.getElementById("scrollToDish").addEventListener("click", () => {
   found.style.background = "#fff0e0";
   setTimeout(() => (found.style.background = "transparent"), 1500);
 });
-
 // === Type de commande ===
 const orderTypeEl = document.getElementById("orderType");
 const dineInFields = document.getElementById("dineInFields");
@@ -800,7 +799,7 @@ sendBtn.addEventListener("click", e => {
   }
   msg += `%0APlats :%0A`;
 
-  // ✅ Ajout correct des plats sélectionnés
+  // ✅ Ajout des plats avec numéro
   for (const item of selected.values()) {
     const lineTotal = item.price * item.qty;
     msg += `#${item.numero} ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
