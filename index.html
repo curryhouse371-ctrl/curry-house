@@ -115,7 +115,37 @@
           placeholder="ex. 5"
           class="w-20 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
           required
-        />
+        /><!-- Type de commande -->
+<label for="orderType" class="text-sm text-gray-700 whitespace-nowrap">Type de commande :</label>
+<select
+  id="orderType"
+  class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
+  required
+>
+  <option value="">Choisir...</option>
+  <option value="Sur place">Sur place</option>
+  <option value="À emporter">À emporter</option>
+</select>
+
+<!-- Champs conditionnels (affichés seulement si sur place) -->
+<div id="dineInFields" class="hidden flex gap-3 items-center flex-wrap">
+  <label for="arrivalTime" class="text-sm text-gray-700">Heure d’arrivée :</label>
+  <input
+    id="arrivalTime"
+    type="time"
+    class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
+  />
+  <label for="peopleCount" class="text-sm text-gray-700">Nombre de personnes :</label>
+  <input
+    id="peopleCount"
+    type="number"
+    min="1"
+    placeholder="ex. 2"
+    class="w-20 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
+  />
+</div>
+
+        
 
         <div class="flex items-center gap-3 mt-2 md:mt-0">
           <div id="orderTotal" class="text-lg font-semibold text-gray-900">
@@ -805,6 +835,67 @@ document.getElementById("scrollToDish").addEventListener("click", () => {
   foundLabel.style.background = "#fff0e0";
   foundLabel.style.transition = "background 0.6s ease";
   setTimeout(() => (foundLabel.style.background = "transparent"), 1500);
+});
+// Affiche/masque les champs selon le type de commande
+const orderTypeEl = document.getElementById("orderType");
+const dineInFields = document.getElementById("dineInFields");
+
+orderTypeEl.addEventListener("change", () => {
+  if (orderTypeEl.value === "Sur place") {
+    dineInFields.classList.remove("hidden");
+  } else {
+    dineInFields.classList.add("hidden");
+  }
+});
+
+// Ajout dans le message WhatsApp
+sendBtn.addEventListener("click", e => {
+  e.preventDefault();
+
+  if (selected.size === 0) {
+    alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
+    return;
+  }
+
+  const name = (document.getElementById("clientName").value || "").trim();
+  const table = (document.getElementById("tableNumber").value || "").trim();
+  const orderType = orderTypeEl.value;
+  const arrivalTime = document.getElementById("arrivalTime").value;
+  const peopleCount = document.getElementById("peopleCount").value;
+
+  if (!name) {
+    alert("Merci d’indiquer le nom du client.");
+    return;
+  }
+
+  if (!orderType) {
+    alert("Merci de choisir le type de commande.");
+    return;
+  }
+
+  if (orderType === "Sur place" && (!arrivalTime || !peopleCount)) {
+    alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
+    return;
+  }
+
+  let msg = `Bonjour Curry House,%0ACommande de ${name}%0A`;
+  if (table) msg += `Table : ${table}%0A`;
+  msg += `Type de commande : ${orderType}%0A`;
+
+  if (orderType === "Sur place") {
+    msg += `Heure d’arrivée : ${arrivalTime}%0ANombre de personnes : ${peopleCount}%0A`;
+  }
+
+  msg += `%0APlats :%0A`;
+  for (const item of selected.values()) {
+    const lineTotal = item.price * item.qty;
+    msg += `- ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
+  }
+
+  msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
+
+  const url = `https://wa.me/33763424110?text=${msg}`;
+  window.open(url, "_blank");
 });
 
   </script>
