@@ -763,34 +763,53 @@ orderTypeEl.addEventListener("change", () => {
   else dineInFields.classList.add("hidden");
 });
 
-// === Envoi WhatsApp ===
+<script>
+// === Envoi WhatsApp (corrigé) ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
-  if (selected.size === 0) return alert("Merci de cocher au moins un plat.");
+
+  if (selected.size === 0) {
+    alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
+    return;
+  }
 
   const name = (document.getElementById("clientName").value || "").trim();
   const orderType = orderTypeEl.value;
   const arrivalTime = document.getElementById("arrivalTime").value;
   const peopleCount = document.getElementById("peopleCount").value;
 
-  if (!name) return alert("Merci d’indiquer le nom du client.");
-  if (!orderType) return alert("Merci de choisir le type de commande.");
-  if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
-    return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
+  if (!name) {
+    alert("Merci d’indiquer le nom du client.");
+    return;
+  }
+  if (!orderType) {
+    alert("Merci de choisir le type de commande.");
+    return;
+  }
+  if (orderType === "Sur place" && (!arrivalTime || !peopleCount)) {
+    alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
+    return;
+  }
 
-  let msg = `Bonjour Curry House,%0ACommande de ${name}%0A`;
+  // Construction du message
+  let msg = `Bonjour Curry House,%0A`;
+  msg += `Commande de ${name}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
-  if (orderType === "Sur place")
-    msg += `Heure d’arrivée : ${arrivalTime}%0ANombre de personnes : ${peopleCount}%0A`;
+  if (orderType === "Sur place") {
+    msg += `Heure d’arrivée : ${arrivalTime}%0A`;
+    msg += `Nombre de personnes : ${peopleCount}%0A`;
+  }
   msg += `%0APlats :%0A`;
 
+  // ✅ Ajout correct des plats sélectionnés
   for (const item of selected.values()) {
-    const total = item.price * item.qty;
-    msg += `#${item.numero} ${item.name} x${item.qty} (${total.toFixed(2).replace(".", ",")} €)%0A`;
+    const lineTotal = item.price * item.qty;
+    msg += `#${item.numero} ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
   }
 
   msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
-  window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
+
+  const whatsappUrl = `https://wa.me/33763424110?text=${msg}`;
+  window.open(whatsappUrl, "_blank");
 });
 </script>
-
