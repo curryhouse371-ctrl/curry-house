@@ -604,7 +604,8 @@
 <script>
 const menuEl = document.getElementById("menu");
 const searchEl = document.getElementById("search");
-const selected = new Map();
+window.selected = window.selected || new Map();
+
 let globalIndex = 1; // numérotation automatique
 
 const euro = n => `${n.toFixed(2).replace(".", ",")} €`;
