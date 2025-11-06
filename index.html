@@ -137,41 +137,9 @@
   />
 </div>
 
-
-       
-        /><!-- Type de commande -->
-<label for="orderType" class="text-sm text-gray-700 whitespace-nowrap">Type de commande :</label>
-<select
-  id="orderType"
-  class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-  required
->
-  <option value="">Choisir...</option>
-  <option value="Sur place">Sur place</option>
-  <option value="À emporter">À emporter</option>
-</select>
-
-<!-- Champs conditionnels (affichés seulement si sur place) -->
-<div id="dineInFields" class="hidden flex gap-3 items-center flex-wrap">
-  <label for="arrivalTime" class="text-sm text-gray-700">Heure d’arrivée :</label>
-  <input
-    id="arrivalTime"
-    type="time"
-    class="px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-  />
-  <label for="peopleCount" class="text-sm text-gray-700">Nombre de personnes :</label>
-  <input
-    id="peopleCount"
-    type="number"
-    min="1"
-    placeholder="ex. 2"
-    class="w-20 px-3 py-2 rounded-lg border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
-  />
-</div>
-
         
-
-        <div class="flex items-center gap-3 mt-2 md:mt-0">
+        
+          <div class="flex items-center gap-3 mt-2 md:mt-0">
           <div id="orderTotal" class="text-lg font-semibold text-gray-900">
             Total : 0,00 €
           </div>
