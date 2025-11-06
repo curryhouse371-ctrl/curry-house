@@ -601,43 +601,41 @@
   </script>
 
   <!-- RENDER / LOGIQUE -->
-  <script>
-    const menuEl = document.getElementById("menu");
-    const searchEl = document.getElementById("search");
+<script>
+const menuEl = document.getElementById("menu");
+const searchEl = document.getElementById("search");
+const selected = new Map();
+let globalIndex = 1; // numérotation continue
 
-    // key = id de l'item, value = { name, price, qty }
-    const selected = new Map();
-    let globalIndex = 1; // pour numéroter les plats
+const euro = n => `${n.toFixed(2).replace(".", ",")} €`;
 
-    const euro = n => `${n.toFixed(2).replace(".", ",")} €`;
+function sectionHeader(title) {
+  return `
+    <div class="flex items-end justify-between mb-3">
+      <h2 class="text-2xl md:text-3xl font-semibold title-gradient">${title}</h2>
+    </div>`;
+}
 
-    function sectionHeader(title){
-      return `
-        <div class="flex items-end justify-between mb-3">
-          <h2 class="text-2xl md:text-3xl font-semibold title-gradient">${title}</h2>
-        </div>`;
-    }
+function catImage(title) {
+  const src = CATEGORY_IMAGES[title] || "";
+  if (!src) return "";
+  return `
+    <div class="cat-image overflow-hidden rounded-xl border border-orange-100 mb-4">
+      <img loading="lazy" src="${src}" alt="${title}" class="w-full object-cover" onerror="this.remove()">
+    </div>`;
+}
 
-    function catImage(title){
-      const src = CATEGORY_IMAGES[title] || "";
-      if (!src) return "";
-      return `
-        <div class="cat-image overflow-hidden rounded-xl border border-orange-100 mb-4">
-          <img loading="lazy" src="${src}" alt="${title}" class="w-full object-cover" onerror="this.remove()">
-        </div>`;
-    }
+function itemRow(item, catIndex, itemIndex) {
+  const id = `item_${catIndex}_${itemIndex}`;
 
- function itemRow(item, catIndex, itemIndex) {
- const id = `item_${catIndex}_${itemIndex}`;
-const displayIndex = globalIndex++;
-
-  // Gestion des sauts manuels
-  if (globalIndex === 7) globalIndex = 9;     // saute 7 et 8
-  if (globalIndex === 45) globalIndex = 46;   // saute 45
-  if (globalIndex === 62) globalIndex = 63;   // saute 62
-  if (globalIndex === 237) globalIndex = 241; // saute 237 à 240
+  // gestion des numéros
+  if (globalIndex === 7) globalIndex = 9;
+  if (globalIndex === 45) globalIndex = 46;
+  if (globalIndex === 62) globalIndex = 63;
+  if (globalIndex === 237) globalIndex = 241;
 
   const displayIndex = globalIndex++;
+
   return `
     <div class="flex items-center justify-between py-2 border-b border-orange-50 gap-3">
       <div class="flex items-start gap-3">
@@ -645,7 +643,7 @@ const displayIndex = globalIndex++;
           id="${id}"
           type="checkbox"
           class="checkbox mt-1"
-          data-name="${item.name.replace(/"/g,'&quot;')}"
+          data-name="${item.name.replace(/"/g, "&quot;")}"
           data-price="${item.price}"
           data-numero="${displayIndex}"
         >
@@ -665,233 +663,136 @@ const displayIndex = globalIndex++;
     </div>`;
 }
 
+function attachHandlers(scopeEl) {
+  scopeEl.querySelectorAll("input.checkbox").forEach(cb => {
+    const id = cb.id;
+    const name = cb.dataset.name;
+    const price = parseFloat(cb.dataset.price || "0");
+    const numero = cb.dataset.numero;
+    const qtyBox = scopeEl.querySelector(`[data-qty-box="${id}"]`);
 
-
-    function attachHandlers(scopeEl){
-      // Cases à cocher
-      scopeEl.querySelectorAll("input.checkbox").forEach(cb => {
-        const id = cb.id;
-        const name = cb.dataset.name;
-        const price = parseFloat(cb.dataset.price || "0");
-        const numero = cb.dataset.numero;
-        const qtyBox = scopeEl.querySelector(`[data-qty-box="${id}"]`);
-        const qtyEl = scopeEl.querySelector(`#qty_${id}`);
-
-        // Si déjà sélectionné, on restaure l'état
-        const existing = selected.get(id);
-        if (existing){
-          cb.checked = true;
-          if (qtyBox) qtyBox.style.display = "flex";
-          if (qtyEl) qtyEl.textContent = existing.qty;
-        }
-
-        cb.addEventListener("change", e => {
-          if (e.target.checked){
-           const current = selected.get(id) || { numero, name, price, qty: 1 };
-            if (!current.qty) current.qty = 1;
-            selected.set(id, current);
-            if (qtyBox) qtyBox.style.display = "flex";
-          } else {
-            selected.delete(id);
-            if (qtyBox) qtyBox.style.display = "none";
-          }
-          updateTotal();
-        });
-      });
-
-      // Boutons +/-
-      scopeEl.querySelectorAll(".qty-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.dataset.id;
-          const action = btn.dataset.action;
-          const item = selected.get(id);
-          if (!item) return;
-
-          if (action === "plus") item.qty++;
-          if (action === "minus" && item.qty > 1) item.qty--;
-
-          selected.set(id, item);
-
-          const qtyEl = scopeEl.querySelector(`#qty_${id}`);
-          if (qtyEl) qtyEl.textContent = item.qty;
-
-          updateTotal();
-        });
-      });
-    }
-
-    function render(data){
-      const q = (searchEl.value || "").trim().toLowerCase();
-      menuEl.innerHTML = "";
-      globalIndex = 1;
-
-      data.forEach((cat, catIndex) => {
-        let html = "";
-        html += sectionHeader(cat.category);
-        html += catImage(cat.category);
-
-        const items = cat.items.filter(it => !q || it.name.toLowerCase().includes(q));
-        if (items.length){
-          html += `
-            <div class="card p-2 md:p-4 divide-y divide-orange-50">
-              ${items.map((item, itemIndex) => itemRow(item, catIndex, itemIndex)).join("")}
-            </div>`;
-        }
-
-        const wrap = document.createElement("section");
-        wrap.className = "mb-12";
-        wrap.innerHTML = html;
-        menuEl.appendChild(wrap);
-        attachHandlers(wrap);
-      });
-
+    cb.addEventListener("change", e => {
+      if (e.target.checked) {
+        selected.set(id, { numero, name, price, qty: 1 });
+        qtyBox.style.display = "flex";
+      } else {
+        selected.delete(id);
+        qtyBox.style.display = "none";
+      }
       updateTotal();
-    }
-
-    function calcTotal(){
-      let total = 0;
-      for (const item of selected.values()){
-        total += item.price * item.qty;
-      }
-      return total;
-    }
-
-    function updateTotal(){
-      const el = document.getElementById("orderTotal");
-      if (!el) return;
-      const total = calcTotal();
-      el.textContent = "Total : " + euro(total);
-    }
-
-    // Recherche en temps réel
-    searchEl.addEventListener("input", () => render(DATA));
-
-    // Premier affichage
-    render(DATA);
-
-    // Bouton WhatsApp
-    const sendBtn = document.getElementById("sendWhatsApp");
-    sendBtn.addEventListener("click", e => {
-      e.preventDefault();
-
-      if (selected.size === 0){
-        alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
-        return;
-      }
-
-      const name = (document.getElementById("clientName").value || "").trim();
-      const table = (document.getElementById("tableNumber").value || "").trim();
-
-      if (!name || !table){
-        alert("Merci d’indiquer le nom du client et le numéro de table.");
-        return;
-      }
-
-      let msg = `Bonjour Curry House,\n`;
-      msg += `Commande de ${name} (table n°${table})\n\n`;
-      msg += `Plats :\n`;
-
-      for (const [id, item] of selected.entries()) {
-  const lbl = document.querySelector(`label[for='${id}'] p.font-medium`);
-  const num = lbl ? lbl.textContent.split(".")[0] : "?"; // récupère le numéro du plat
-  const lineTotal = item.price * item.qty;
-  msg += `- [${num}] ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)\n`;
-}
-
-
-      msg += `\n🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
-
-      const url = `https://wa.me/33763424110?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
     });
-   // === Recherche et défilement par numéro de plat ===
-document.getElementById("scrollToDish").addEventListener("click", () => {
-  const num = parseInt(document.getElementById("searchByNumber").value);
-  if (!num || num < 1) {
-    alert("Veuillez entrer un numéro de plat valide.");
-    return;
-  }
-
-  const allLabels = document.querySelectorAll("#menu label p.font-medium");
-  let foundLabel = null;
-
-  allLabels.forEach(lbl => {
-    if (lbl.textContent.trim().startsWith(num + ".")) {
-      foundLabel = lbl;
-    }
   });
 
-  if (!foundLabel) {
-    alert(`Aucun plat trouvé avec le numéro ${num}.`);
-    return;
-  }
+  scopeEl.querySelectorAll(".qty-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const item = selected.get(id);
+      if (!item) return;
 
-  foundLabel.scrollIntoView({ behavior: "smooth", block: "center" });
-  foundLabel.style.background = "#fff0e0";
-  foundLabel.style.transition = "background 0.6s ease";
-  setTimeout(() => (foundLabel.style.background = "transparent"), 1500);
+      if (btn.dataset.action === "plus") item.qty++;
+      if (btn.dataset.action === "minus" && item.qty > 1) item.qty--;
+
+      selected.set(id, item);
+      scopeEl.querySelector(`#qty_${id}`).textContent = item.qty;
+      updateTotal();
+    });
+  });
+}
+
+function render(data) {
+  const q = (searchEl.value || "").trim().toLowerCase();
+  menuEl.innerHTML = "";
+  globalIndex = 1;
+
+  data.forEach((cat, catIndex) => {
+    const items = cat.items.filter(it => !q || it.name.toLowerCase().includes(q));
+    if (!items.length) return;
+
+    let html = "";
+    html += sectionHeader(cat.category);
+    html += catImage(cat.category);
+    html += `<div class="card p-2 md:p-4 divide-y divide-orange-50">
+      ${items.map((item, itemIndex) => itemRow(item, catIndex, itemIndex)).join("")}
+    </div>`;
+
+    const wrap = document.createElement("section");
+    wrap.className = "mb-12";
+    wrap.innerHTML = html;
+    menuEl.appendChild(wrap);
+    attachHandlers(wrap);
+  });
+
+  updateTotal();
+}
+
+function calcTotal() {
+  let total = 0;
+  for (const item of selected.values()) total += item.price * item.qty;
+  return total;
+}
+
+function updateTotal() {
+  document.getElementById("orderTotal").textContent = "Total : " + euro(calcTotal());
+}
+
+// === Recherche plat par nom ===
+searchEl.addEventListener("input", () => render(DATA));
+render(DATA);
+
+// === Recherche par numéro ===
+document.getElementById("scrollToDish").addEventListener("click", () => {
+  const num = parseInt(document.getElementById("searchByNumber").value);
+  if (!num || num < 1) return alert("Veuillez entrer un numéro valide.");
+
+  const allLabels = document.querySelectorAll("#menu label p.font-medium");
+  let found = null;
+  allLabels.forEach(lbl => {
+    if (lbl.textContent.trim().startsWith(num + ".")) found = lbl;
+  });
+
+  if (!found) return alert(`Aucun plat avec le numéro ${num}.`);
+  found.scrollIntoView({ behavior: "smooth", block: "center" });
+  found.style.background = "#fff0e0";
+  setTimeout(() => (found.style.background = "transparent"), 1500);
 });
-// Affiche/masque les champs selon le type de commande
+
+// === Type de commande (sur place / à emporter) ===
 const orderTypeEl = document.getElementById("orderType");
 const dineInFields = document.getElementById("dineInFields");
+const sendBtn = document.getElementById("sendWhatsApp");
 
 orderTypeEl.addEventListener("change", () => {
-  if (orderTypeEl.value === "Sur place") {
-    dineInFields.classList.remove("hidden");
-  } else {
-    dineInFields.classList.add("hidden");
-  }
+  if (orderTypeEl.value === "Sur place") dineInFields.classList.remove("hidden");
+  else dineInFields.classList.add("hidden");
 });
 
+// === Envoi WhatsApp ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
-
-  if (selected.size === 0) {
-    alert("Merci de cocher au moins un plat avant d’envoyer la commande.");
-    return;
-  }
+  if (selected.size === 0) return alert("Merci de cocher au moins un plat.");
 
   const name = (document.getElementById("clientName").value || "").trim();
   const orderType = orderTypeEl.value;
   const arrivalTime = document.getElementById("arrivalTime").value;
   const peopleCount = document.getElementById("peopleCount").value;
 
-  if (!name) {
-    alert("Merci d’indiquer le nom du client.");
-    return;
-  }
-
-  if (!orderType) {
-    alert("Merci de choisir le type de commande.");
-    return;
-  }
-
-  if (orderType === "Sur place" && (!arrivalTime || !peopleCount)) {
-    alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
-    return;
-  }
+  if (!name) return alert("Merci d’indiquer le nom du client.");
+  if (!orderType) return alert("Merci de choisir le type de commande.");
+  if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
+    return alert("Merci d’indiquer l’heure et le nombre de personnes.");
 
   let msg = `Bonjour Curry House,%0ACommande de ${name}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
-
-  if (orderType === "Sur place") {
+  if (orderType === "Sur place")
     msg += `Heure d’arrivée : ${arrivalTime}%0ANombre de personnes : ${peopleCount}%0A`;
+  msg += `%0APlats :%0A`;
+
+  for (const item of selected.values()) {
+    const total = item.price * item.qty;
+    msg += `#${item.numero} ${item.name} x${item.qty} (${total.toFixed(2).replace(".", ",")} €)%0A`;
   }
 
-  msg += `%0APlats :%0A`;
-for (const item of selected.values()) {
-  const lineTotal = item.price * item.qty;
-  msg += `#${item.numero} ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
-}
-
-
   msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
-
-  const url = `https://wa.me/33763424110?text=${msg}`;
-  window.open(url, "_blank");
+  window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
 });
-
-
-  </script>
-</body>
-</html>
+</script>
