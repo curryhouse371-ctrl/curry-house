@@ -753,7 +753,9 @@ document.getElementById("scrollToDish").addEventListener("click", () => {
   const allLabels = document.querySelectorAll("#menu label p.font-medium");
   let found = null;
   allLabels.forEach(lbl => {
-    if (lbl.textContent.trim().startsWith("#" + num)) found = lbl;
+   const txt = lbl.textContent.trim();
+if (txt.startsWith(num + ".") || txt.startsWith("#" + num)) found = lbl;
+
   });
 
   if (!found) return alert(`Aucun plat trouvé avec le numéro ${num}.`);
