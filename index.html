@@ -692,7 +692,7 @@ function itemRow(item, catIndex, itemIndex) {
       if (!item) return;
       if (btn.dataset.action === "plus") item.qty++;
       if (btn.dataset.action === "minus" && item.qty > 1) item.qty--;
-      selected.set(id, item);
+     window.selected.set(id, item);
       scopeEl.querySelector(`#qty_${id}`).textContent = item.qty;
       updateTotal();
     });
