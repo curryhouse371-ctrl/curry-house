@@ -627,8 +627,14 @@ function catImage(title) {
 // === Lignes de plats ===
 function itemRow(item, catIndex, itemIndex) {
   const id = `item_${catIndex}_${itemIndex}`;
-  const displayIndex = globalIndex++;
 
+  // Gestion des sauts manuels
+  if (globalIndex === 7) globalIndex = 9;     // saute 7 et 8
+  if (globalIndex === 45) globalIndex = 46;   // saute 45
+  if (globalIndex === 62) globalIndex = 63;   // saute 62
+  if (globalIndex === 237) globalIndex = 241; // saute 237 à 240
+
+  const displayIndex = globalIndex++;
   return `
     <div class="flex items-center justify-between py-2 border-b border-orange-50 gap-3">
       <div class="flex items-start gap-3">
@@ -636,12 +642,11 @@ function itemRow(item, catIndex, itemIndex) {
           id="${id}"
           type="checkbox"
           class="checkbox mt-1"
-          data-name="${item.name.replace(/"/g, "&quot;")}"
+          data-name="${item.name.replace(/"/g,'&quot;')}"
           data-price="${item.price}"
-          data-numero="${displayIndex}"
         >
         <label for="${id}" class="cursor-pointer">
-          <p class="font-medium">#${displayIndex}. ${item.name}</p>
+          <p class="font-medium">${displayIndex}. ${item.name}</p>
           ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
         </label>
       </div>
@@ -653,8 +658,6 @@ function itemRow(item, catIndex, itemIndex) {
         </div>
         <div class="price whitespace-nowrap">${euro(item.price)}</div>
       </div>
-      
-
     </div>`;
 }
 
