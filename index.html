@@ -605,10 +605,11 @@
 const menuEl = document.getElementById("menu");
 const searchEl = document.getElementById("search");
 const selected = new Map();
-let globalIndex = 1; // numérotation continue
+let globalIndex = 1; // numérotation automatique
 
 const euro = n => `${n.toFixed(2).replace(".", ",")} €`;
 
+// === Structure visuelle ===
 function sectionHeader(title) {
   return `
     <div class="flex items-end justify-between mb-3">
@@ -625,15 +626,9 @@ function catImage(title) {
     </div>`;
 }
 
+// === Lignes de plats ===
 function itemRow(item, catIndex, itemIndex) {
   const id = `item_${catIndex}_${itemIndex}`;
-
-  // gestion des numéros
-  if (globalIndex === 7) globalIndex = 9;
-  if (globalIndex === 45) globalIndex = 46;
-  if (globalIndex === 62) globalIndex = 63;
-  if (globalIndex === 237) globalIndex = 241;
-
   const displayIndex = globalIndex++;
 
   return `
@@ -648,7 +643,7 @@ function itemRow(item, catIndex, itemIndex) {
           data-numero="${displayIndex}"
         >
         <label for="${id}" class="cursor-pointer">
-          <p class="font-medium">${displayIndex}. ${item.name}</p>
+          <p class="font-medium">#${displayIndex}. ${item.name}</p>
           ${item.desc ? `<p class="text-sm text-gray-600">${item.desc}</p>` : ""}
         </label>
       </div>
@@ -663,6 +658,7 @@ function itemRow(item, catIndex, itemIndex) {
     </div>`;
 }
 
+// === Gestion des événements ===
 function attachHandlers(scopeEl) {
   scopeEl.querySelectorAll("input.checkbox").forEach(cb => {
     const id = cb.id;
@@ -688,10 +684,8 @@ function attachHandlers(scopeEl) {
       const id = btn.dataset.id;
       const item = selected.get(id);
       if (!item) return;
-
       if (btn.dataset.action === "plus") item.qty++;
       if (btn.dataset.action === "minus" && item.qty > 1) item.qty--;
-
       selected.set(id, item);
       scopeEl.querySelector(`#qty_${id}`).textContent = item.qty;
       updateTotal();
@@ -699,6 +693,7 @@ function attachHandlers(scopeEl) {
   });
 }
 
+// === Rendu du menu ===
 function render(data) {
   const q = (searchEl.value || "").trim().toLowerCase();
   menuEl.innerHTML = "";
@@ -711,20 +706,22 @@ function render(data) {
     let html = "";
     html += sectionHeader(cat.category);
     html += catImage(cat.category);
-    html += `<div class="card p-2 md:p-4 divide-y divide-orange-50">
-      ${items.map((item, itemIndex) => itemRow(item, catIndex, itemIndex)).join("")}
-    </div>`;
+    html += `
+      <div class="card p-2 md:p-4 divide-y divide-orange-50">
+        ${items.map((item, itemIndex) => itemRow(item, catIndex, itemIndex)).join("")}
+      </div>`;
 
-    const wrap = document.createElement("section");
-    wrap.className = "mb-12";
-    wrap.innerHTML = html;
-    menuEl.appendChild(wrap);
-    attachHandlers(wrap);
+    const section = document.createElement("section");
+    section.className = "mb-12";
+    section.innerHTML = html;
+    menuEl.appendChild(section);
+    attachHandlers(section);
   });
 
   updateTotal();
 }
 
+// === Calcul total ===
 function calcTotal() {
   let total = 0;
   for (const item of selected.values()) total += item.price * item.qty;
@@ -735,7 +732,7 @@ function updateTotal() {
   document.getElementById("orderTotal").textContent = "Total : " + euro(calcTotal());
 }
 
-// === Recherche plat par nom ===
+// === Recherche par nom ===
 searchEl.addEventListener("input", () => render(DATA));
 render(DATA);
 
@@ -747,16 +744,16 @@ document.getElementById("scrollToDish").addEventListener("click", () => {
   const allLabels = document.querySelectorAll("#menu label p.font-medium");
   let found = null;
   allLabels.forEach(lbl => {
-    if (lbl.textContent.trim().startsWith(num + ".")) found = lbl;
+    if (lbl.textContent.trim().startsWith("#" + num)) found = lbl;
   });
 
-  if (!found) return alert(`Aucun plat avec le numéro ${num}.`);
+  if (!found) return alert(`Aucun plat trouvé avec le numéro ${num}.`);
   found.scrollIntoView({ behavior: "smooth", block: "center" });
   found.style.background = "#fff0e0";
   setTimeout(() => (found.style.background = "transparent"), 1500);
 });
 
-// === Type de commande (sur place / à emporter) ===
+// === Type de commande ===
 const orderTypeEl = document.getElementById("orderType");
 const dineInFields = document.getElementById("dineInFields");
 const sendBtn = document.getElementById("sendWhatsApp");
@@ -779,7 +776,7 @@ sendBtn.addEventListener("click", e => {
   if (!name) return alert("Merci d’indiquer le nom du client.");
   if (!orderType) return alert("Merci de choisir le type de commande.");
   if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
-    return alert("Merci d’indiquer l’heure et le nombre de personnes.");
+    return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
 
   let msg = `Bonjour Curry House,%0ACommande de ${name}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
@@ -796,3 +793,4 @@ sendBtn.addEventListener("click", e => {
   window.open(`https://wa.me/33763424110?text=${msg}`, "_blank");
 });
 </script>
+
