@@ -768,7 +768,7 @@ orderTypeEl.addEventListener("change", () => {
   else dineInFields.classList.add("hidden");
 });
 
-// === Envoi WhatsApp (corrigé) ===
+  // === Envoi WhatsApp (corrigé et stabilisé) ===
 sendBtn.addEventListener("click", e => {
   e.preventDefault();
 
@@ -782,20 +782,12 @@ sendBtn.addEventListener("click", e => {
   const arrivalTime = document.getElementById("arrivalTime").value;
   const peopleCount = document.getElementById("peopleCount").value;
 
-  if (!name) {
-    alert("Merci d’indiquer le nom du client.");
-    return;
-  }
-  if (!orderType) {
-    alert("Merci de choisir le type de commande.");
-    return;
-  }
-  if (orderType === "Sur place" && (!arrivalTime || !peopleCount)) {
-    alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
-    return;
-  }
+  if (!name) return alert("Merci d’indiquer le nom du client.");
+  if (!orderType) return alert("Merci de choisir le type de commande.");
+  if (orderType === "Sur place" && (!arrivalTime || !peopleCount))
+    return alert("Merci d’indiquer l’heure d’arrivée et le nombre de personnes.");
 
-  // Construction du message
+  // Message initial
   let msg = `Bonjour Curry House,%0A`;
   msg += `Commande de ${name}%0A`;
   msg += `Type de commande : ${orderType}%0A`;
@@ -805,14 +797,16 @@ sendBtn.addEventListener("click", e => {
   }
   msg += `%0APlats :%0A`;
 
-  // ✅ Ajout des plats avec numéro
-  for (const item of selected.values()) {
-    const lineTotal = item.price * item.qty;
-    msg += `#${item.numero} ${item.name} x${item.qty} (${lineTotal.toFixed(2).replace(".", ",")} €)%0A`;
-  }
+  // ✅ On convertit la Map en tableau pour éviter les pertes
+  const itemsArray = Array.from(selected.values());
+  itemsArray.forEach(it => {
+    const lineTotal = (it.price * it.qty).toFixed(2).replace(".", ",");
+    msg += `#${it.numero} ${it.name} x${it.qty} (${lineTotal} €)%0A`;
+  });
 
   msg += `%0A🔸 Total : ${calcTotal().toFixed(2).replace(".", ",")} €`;
 
+  // Envoi
   const whatsappUrl = `https://wa.me/33763424110?text=${msg}`;
   window.open(whatsappUrl, "_blank");
 });
